@@ -1,0 +1,62 @@
+!
+hostname DHCP
+!
+no ip domain lookup
+!
+ip dhcp excluded-address 192.168.1.62
+ip dhcp excluded-address 192.168.1.78
+ip dhcp excluded-address 192.168.1.86
+ip dhcp excluded-address 192.168.1.1
+ip dhcp excluded-address 192.168.1.65
+ip dhcp excluded-address 192.168.1.84
+ip dhcp excluded-address 192.168.1.2
+ip dhcp excluded-address 192.168.1.66
+ip dhcp excluded-address 192.168.1.81
+!
+ip dhcp pool vlan 10
+ network 192.168.1.0 255.255.255.192
+ default-router 192.168.1.62 
+!
+ip dhcp pool vlan 20
+ network 192.168.1.64 255.255.255.240
+ default-router 192.168.1.78 
+!
+ip dhcp pool vlan 30
+ network 192.168.1.80 255.255.255.248
+ default-router 192.168.1.86 
+!
+ip cef
+no ipv6 cef
+!
+redundancy
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ no shutdown
+!
+interface GigabitEthernet0/0
+ ip address 192.168.1.121 255.255.255.252
+ no shutdown
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip address 192.168.1.125 255.255.255.252
+ no shutdown
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+ default-information originate
+!
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0 5
+ip forward-protocol nd
+!
+control-plane
+!
+end

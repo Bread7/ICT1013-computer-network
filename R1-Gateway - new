@@ -1,0 +1,50 @@
+!
+hostname R1_Gateway
+!
+no ip domain lookup
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 192.168.1.91 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 1 ip 192.168.1.89
+ standby 1 priority 150
+ standby 1 preempt
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1
+ ip address 192.168.1.99 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 2 ip 192.168.1.97
+ standby 2 priority 150
+ standby 2 preempt
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/2
+ ip address 172.27.47.17 255.255.255.252
+ ip nat outside
+ duplex auto
+ speed auto
+ no shutdown
+!
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+ default-information originate
+!
+ip nat pool public-access 129.126.163.33 129.126.163.38 netmask 255.255.255.248
+ip nat inside source list 1 pool public-access overload
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/2
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1 5
+!
+access-list 1 permit 192.168.1.0 0.0.0.255
+!
+end

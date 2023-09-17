@@ -1,0 +1,51 @@
+!
+hostname R2_Gateway
+!
+no ip domain lookup
+!
+spanning-tree extend system-id
+!
+interface GigabitEthernet0/0/0
+ ip address 192.168.1.106 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 1 ip 192.168.1.105
+ standby 1 priority 150
+ standby 1 preempt
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet0/0/1
+ ip address 192.168.1.114 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 2 ip 192.168.1.113
+ standby 2 priority 150
+ standby 2 preempt
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet0/1/0
+ ip address 172.27.47.170 255.255.255.252
+ ip nat outside
+ standby version 2
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+ default-information originate
+!
+ip nat inside source list 1 interface GigabitEthernet0/1/0 overload
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1/0
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0/0 5
+!
+access-list 1 permit 192.168.1.0 0.0.0.255
+!
+end
